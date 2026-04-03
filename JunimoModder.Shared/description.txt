@@ -1,0 +1,180 @@
+erstelle ein maui projekt güt windows, macos, android.
+das soll so sein:
+
+main menu(start):
+projekt übersicht, projekte ertsellen, löschen, öffnen und mehr
+wehröggnrznn du auf ein projekt drückst, öffnet es sich. wenn du doppelklickst pder länger als 3s, dann öffnet sich ein mini menu . dort gibt es dann rename, delete, export, duplicate.
+
+wenn du projekt erstellen drückst, kommt die aufforderung, das zu benennen, das wird dannn gespeichert.
+
+
+Beim ersten start, wird man aufgefordert, einen standard pfad zu wählen für die projekte.
+dies wird gespeichert. die projekte werden dann im appverzeichnis erstellt und im pfad, wobei der pfad vorrang hatt!!!!
+
+
+
+die ordner strukutr wird dann so sein:(im pfad):
+
+(root)= path
+path/
+App_Version.txt
+i18n/*.json
+Projects/*/
+          /* usw
+Frameworks/*/
+           Version.txt
+           /* usw
+           /i18n/*.json
+
+
+wenn du ein projekt geöffnet hast, gibt es 2 bereiche: links,rechts, burger menu(small), dort sind dann sachen wie speichern, speichern unter, zur vorherigen seite usw. Links ca 15% des bildschrims sind die datien im projekt.
+rechts ist der aktuelle editor mit den dateien: c#=vs code(klon), png=pixel editor, tbin/tmx=tiled klon, json= Wirst gefragt ob: vs code(klon oder passendes Framework)
+
+Editoren die es gibt:
+map,
+png,
+cs,
+Framework(json).
+
+die ersten 3 sind selbst erklären, aber Framework nicht, lass es mich erklären-
+
+ein ui(json basiert) zb
+{
+    "TemplateRoot": "// path"
+    "TemplateFile": "{{TemplateRoot}}/*/*.json". // , category, file. z.b cp/items/cookingrecipe.json
+    "UI":[
+        "//":[ //a id for the field
+            "scale": ["with": "//", "height": "//"]
+            "OnScreenPos": ["with": "//", "height": "//"]
+            "text": {{i18n/abc}} //abc ist ein paltzhalter key in der i18n datei. das verzeichnis wird durch TemplateRoot ermitellt. in jedem TemplateRoot liegt ein i18n ordner.
+            "TargetLine": "// int",
+            "TargetKey": "// string",
+            "Type": "dopdown,text,ibz more.........."
+        ],
+        "//":[ //a id for the field
+            "scale": ["with": "//", "height": "//"]
+            "OnScreenPos": ["with": "//", "height": "//"]
+            "text": {{i18n/abc}} //abc ist ein paltzhalter key in der i18n datei. das verzeichnis wird durch TemplateRoot ermitellt. in jedem TemplateRoot liegt ein i18n ordner.
+            "TargetLine": "// int",
+            "TargetKey": "// string",
+            "Type": "dopdown,text,ibz more.........."
+        ],
+        "//":[ //a id for the field
+            "scale": ["with": "//", "height": "//"]
+            "OnScreenPos": ["with": "//", "height": "//"]
+            "text": {{i18n/abc}} //abc ist ein paltzhalter key in der i18n datei. das verzeichnis wird durch TemplateRoot ermitellt. in jedem TemplateRoot liegt ein i18n ordner.
+            "TargetLine": "// int",
+            "TargetKey": "// string",
+            "Type": "dopdown,text,ibz more.........."
+        ],
+        "//":[ //a id for the field
+            "scale": ["with": "//", "height": "//"]
+            "OnScreenPos": ["with": "//", "height": "//"]
+            "text": {{i18n/abc}} //abc ist ein paltzhalter key in der i18n datei. das verzeichnis wird durch TemplateRoot ermitellt. in jedem TemplateRoot liegt ein i18n ordner.
+            "TargetLine": "// int",
+            "TargetKey": "// string",
+            "Type": "dopdown,text,ibz more.........."
+        ]
+    ]
+}
+
+Das template beispil:
+{
+  "Changes": [
+    {
+      "LogName": "Load Silvan",
+      "Action": "EditData",
+      "Target": "Data/Characters",
+      "Entries": {
+        "Silvan": {
+          "DisplayName": "{{i18n:Silvan}}",
+          "BirthSeason": "fall",
+          "BirthDay": 22,
+          "HomeRegion": "Town",
+          "Gender": "male",
+          "Age": "Adult",
+          "Manner": "Polite",
+          "SocialAnxiety": "outgoing",
+          "Optimism": "Positive",
+          "CanBeRomanced": false,
+          "CanVisitIsland": false,
+          "WinterStarParticipant": false,
+          "Home": [
+            {
+              "Id": "Default",
+              "Location": "SilvansHome",
+              "Tile": {
+                "X": 6,
+                "Y": 7
+              },
+              "Direction": "down"
+            }
+          ]
+        }
+      }
+    },
+
+    {
+      "LogName": "Load GiftTastes for Silvan",
+      "Action": "EditData",
+      "Target": "Data/NPCGiftTastes",
+      "Entries": {
+        "Silvan": "{{i18n:Silvan.Love}}/Steak Meat/{{i18n:Silvan.Like}}/74/{{i18n:Silvan.Neutral}}//{{i18n:Silvan.Dislike}}//{{i18n:Silvan.Hate}}/"
+      }
+    },
+
+    {
+	    "LogName": "Load Schedule for Silvan",
+      "Target": "Characters/schedules/Silvan",
+      "Action": "Load",
+      "FromFile": "assets/NpcData/Silvan/schedule.json"
+    },
+	
+    {
+	    "LogName": "Load Dialogue for Silvan",
+      "Action": "Include",
+      "FromFile": "assets/NpcData/Silvan/dialogue.json"
+    },
+	
+	
+    
+    {
+      "LogName": "Load Portrait for Silvan",
+      "Action": "Load",
+      "Target": "Portraits/Silvan",
+      "FromFile": "assets/NpcData/Silvan/SilvanPortrait.png"
+    },
+	
+	{
+      "LogName": "Load sprite for Silvan",
+      "Action": "Load",
+      "Target": "Characters/Silvan",
+      "FromFile": "assets/NpcData/Silvan/SilvanSprite.png"
+    },
+	
+    {
+      "LogName": "Silvan_Forest_Event",
+      "Action": "EditData",
+      "Target": "Data/Events/WerewolfForest",
+      "Entries": {
+        "Silvan_Forest/t 1900 2300": "nightTime/34 14/farmer 39 14 3 Silvan 33 14 1 Lara 58 14 3/move Silvan 5 0 1/pause 1500/speak Silvan \"OH,ein kleiner Snack für die Nacht.\"/playSound biiten/pause 500/speak Silvan \"Was ist Passiert,Ich war besessen von dem Mond.\"/move Lara -18 0 3/pause 1500/speak Lara \"Du hast @ gebissen, du Monster !!!\"/pause 500/speak Lara \"Komm nicht näher Monster !!!\"/move Silvan -3 0 1/pause 500/speak Silvan \"Du wirst nun Teil des Rudels @.\"/pause 2000/speak Lara \"Lass das so schnell wie möglich von Harvey untersuchen @.\"/end"
+      }
+    },
+	
+    {
+      "LogName": "Silvan_Hospital_Event",
+      "Action": "EditData",
+      "Target": "Data/Events/Hospital",
+      "Entries": {
+        "Silvan_Hospital/t 900 1500": "none/21 12/farmer 20 12 2 Harvey 21 12 3/pause 2000/speak Harvey \"Das sieht schlimm aus @, du solltest dich ausruhen.\"/pause 2000/speak Harvey \"Wie ist das passiert ?\"/pause 2000/speak Harvey \"Ihr seid einem Monster mit grauem Fell, langen spitzen Ohren, roten Augen und einem Schwanz begegnet...\"/pause 5000/speak Harvey \"Das klingt nach einem Werwolf, einer schrecklichen Kreatur der Nacht.\"/speak Harvey \"Halte dich von Menschen fern!\"/end"
+      },
+      "When": {
+        "HasSeenEvent: CurrentPlayer |contains=Silvan_Forest": true
+      }
+    }
+  ]
+}
+
+
+dies ist nicht volständig, aber was es wird, kann amn sich denken.
+

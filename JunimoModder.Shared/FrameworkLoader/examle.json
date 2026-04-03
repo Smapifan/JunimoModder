@@ -1,0 +1,6 @@
+{
+    "// sprachkürzel": "", // das sprachkürzel der sprache des systems. z.b de,en,fr,es,ru,cn,jp
+    "// sprachname": "", // der name der sprache in der sprache selbst. z.b deutsch, english, français, español, русский, 中文, 日本語
+    "// description": "", // eine beschreibung der sprache
+    "// keys": "" //die key sind aus dem programm und nur für das core.
+}

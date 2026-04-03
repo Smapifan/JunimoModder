@@ -1,0 +1,4 @@
+der teil der den Frameworks/ ordner lädt und anaylsiert.
+ein framework wird 2 teile haben: UI/ und Templates/ 
+dazu makiert siw manifest das root und im root müssen die ui/template usw liegen. es kann bis zuu 1000000000000000000000 roots geben, egal. es ist immer richtig(arbeitet auch mit I18N)
+die ui ist json basiert sowie das template

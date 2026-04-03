@@ -1,0 +1,9 @@
+// die cs Dateien, die das i18n System laden und verwalten. es können viele dateie nsein, wenig, IST EGAL, hauptsache es läüft 100% stabil.
+es lädt automatisch dei daten aus i18n/ beim build wird aus i18nCore/ dann i18n/ 
+
+eine beispeilhafte datei liegt in i18nCore/
+
+das selbe für Framework loader, nur bisschen anders: so: am ende nach dem Build wird es so sein:
+Frameworks/*/*.json es kann aber bis zu unendlich unterordner geben. direkt im framework gibt es aber einen!
+Frameworks/*/i18n/*.json es muss im framework root liegen. wenn das framework abr erst nach x unterordner beginnt klappt es auch.
+z.b so: Frameworks/*/*/*/*/*/*/*/*/*/*/*/i18n/*.json ist egal, hauptsache es liegt in dem selben ordner wie die manifest.json zu dem framework.

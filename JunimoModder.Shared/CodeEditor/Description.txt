@@ -1,0 +1,2 @@
+Ein editor wie vs code, der ein paar exetentions hat in exetentions/ und Nuget support.
+er soll auch ein integrierten dll und exe builder haben!

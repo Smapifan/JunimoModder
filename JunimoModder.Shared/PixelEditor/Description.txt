@@ -1,0 +1,1 @@
+ein editor der so nah wie möglich an Pixel Studio ist. auch bedienen usw
