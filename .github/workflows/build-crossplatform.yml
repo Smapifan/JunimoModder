@@ -1,0 +1,96 @@
+name: Build MAUI app cross-platform
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install .NET SDKs
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.x
+            9.x
+            10.x
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Restore NuGet packages
+        run: dotnet restore
+
+      - name: Build MAUI Android
+        run: dotnet publish -f:net8.0-android -c Release -o output-android
+
+      - name: Upload Android Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Android-APK
+          path: |
+            output-android/*.apk
+            output-android/*.aab
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install .NET SDKs
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.x
+            9.x
+            10.x
+
+      - name: Restore NuGet packages
+        run: dotnet restore
+
+      - name: Build MAUI WinUI
+        run: dotnet publish -f:net8.0-windows10.0.19041.0 -c Release -o output-win
+
+      - name: Upload Windows Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Win-EXE
+          path: |
+            output-win/*.exe
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install .NET SDKs
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.x
+            9.x
+            10.x
+
+      - name: Restore NuGet packages
+        run: dotnet restore
+
+      - name: Build MAUI MacCatalyst
+        run: dotnet publish -f:net8.0-maccatalyst -c Release -o output-mac
+
+      - name: Compress Mac Bundle
+        run: tar -czvf JunimoModder-mac.tar.gz -C output-mac .
+
+      - name: Upload MacOS Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MacOS-App
+          path: |
+            JunimoModder-mac.tar.gz
