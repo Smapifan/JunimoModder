@@ -1,53 +1,45 @@
-# JunimoModder Cross-Platform Buildscript lokal
-# Dieses Skript lädt alle Tools (soweit möglich) und baut für Windows, Android, Mac.
-# Funktioniert aus PowerShell heraus, Windows/macOS bevorzugt.
+# JunimoModder: Lokaler Cross-Platform-Build für Windows/Android/macOS (.NET 9)
+# Ausführen im Root des Repositories!
 
-# 1. .NET 8, 9, 10 installieren (falls nötig)
-$dotnetVersions = @('8.0', '9.0', '10.0')
-foreach ($v in $dotnetVersions) {
-    $sdkFound = &dotnet --list-sdks | Select-String "^$v"
-    if (-not $sdkFound) {
-        Write-Host "Bitte .NET SDK $v manuell installieren. Download unter https://dotnet.microsoft.com/download/dotnet/$v"
-        Start-Sleep -Seconds 2
-    } else {
-        Write-Host ".NET SDK $v ist vorhanden."
-    }
+# .NET 9-Erkennung und Install-Hinweis
+$dotnetVersion = & dotnet --list-sdks | Select-String "^9"
+if (-not $dotnetVersion) {
+    Write-Host ".NET 9 SDK nicht gefunden! Bitte von https://dotnet.microsoft.com/download/dotnet/9.0 installieren."
+    exit 1
+}
+else {
+    Write-Host ".NET 9 SDK gefunden."
 }
 
-# 2. MAUI-Workloads installieren
-Write-Host "Installiere MAUI-Workloads (dies kann dauern)..."
-& dotnet workload install maui maui-android maui-maccatalyst maui-windows wasm-tools --skip-sign-check --source https://api.nuget.org/v3/index.json
+# MAUI-Workloads installieren
+Write-Host "Installiere MAUI-Workloads..."
+dotnet workload install maui maui-android maui-windows maui-maccatalyst wasm-tools --skip-sign-check --source https://api.nuget.org/v3/index.json
 
-# 3. Für Android: Java & Android-SDK (nur Windows Beispiel)
+# Plattform-Erkennung für Builds
+function Is-MacOS {
+    return ($IsMacOS -or $env:OSTYPE -like "*darwin*")
+}
+
+# ---------- Android ----------
+Write-Host "`n=== Android Build ==="
+dotnet restore JunimoModder.Android/JunimoModder.Android.csproj
+dotnet publish JunimoModder.Android/JunimoModder.Android.csproj -c Release -o output-android
+Write-Host "Android Build: output-android (APK/AAB)"
+
+# ---------- Windows ----------
 if ($env:OS -eq "Windows_NT") {
-    if (-not (Get-Command "javac" -ErrorAction SilentlyContinue)) {
-        Write-Host "Bitte Java 17 installieren: https://adoptium.net/temurin/releases/?version=17"
-    }
-    # Android SDK kann mit Android Studio oder Befehl extra geladen werden
-    Write-Host "Bitte Android SDK (command line tools) installieren, falls nicht vorhanden: https://developer.android.com/studio"
+    Write-Host "`n=== Windows Build ==="
+    dotnet restore JunimoModder.Windows/JunimoModder.Windows.csproj
+    dotnet publish JunimoModder.Windows/JunimoModder.Windows.csproj -c Release -o output-win
+    Write-Host "Windows Build: output-win (EXE)"
 }
 
-# 4. NuGet Restore
-dotnet restore
-
-# 5. Builds
-# Windows (wenn Windows)
-if ($env:OS -eq "Windows_NT") {
-    Write-Host "Baue Windows EXE..."
-    dotnet publish -f:net8.0-windows10.0.19041.0 -c Release -o output-win
-    Write-Host "EXE in output-win"
+# ---------- macOS ----------
+if (Is-MacOS) {
+    Write-Host "`n=== macOS Build ==="
+    dotnet restore JunimoModder.MacOS/JunimoModder.MacOS.csproj
+    dotnet publish JunimoModder.MacOS/JunimoModder.MacOS.csproj -c Release -o output-mac
+    Write-Host "macOS Build: output-mac (App)"
 }
 
-# Android
-Write-Host "Baue Android APK/AAB..."
-dotnet publish -f:net8.0-android -c Release -o output-android
-Write-Host "APK/AAB in output-android"
-
-# Mac Catalyst (wenn macOS)
-if ($IsMacOS -or $env:OSTYPE -like "*darwin*") {
-    Write-Host "Baue Mac Catalyst App..."
-    dotnet publish -f:net8.0-maccatalyst -c Release -o output-mac
-    Write-Host "App-Bundle in output-mac"
-}
-
-Write-Host "Alle Builds abgeschlossen."
+Write-Host "`nAlle Builds abgeschlossen. Die fertigen Pakete liegen in den jeweiligen output-* Ordnern."
