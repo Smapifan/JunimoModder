@@ -1,4 +1,4 @@
-name: Build MAUI app cross-platform
+name: Build MAUI App Cross-Platform
 
 on:
   workflow_dispatch:
@@ -10,13 +10,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: .NET SDKs installieren
+      - name: .NET 9 installieren
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: |
-            8.x
-            9.x
-            10.x
+          dotnet-version: '9.x'
 
       - name: Java installieren
         uses: actions/setup-java@v4
@@ -30,11 +27,11 @@ jobs:
       - name: MAUI Workloads installieren
         run: dotnet workload install maui maui-android wasm-tools --skip-sign-check --source https://api.nuget.org/v3/index.json
 
-      - name: NuGet Pakete wiederherstellen
-        run: dotnet restore
+      - name: NuGet wiederherstellen
+        run: dotnet restore JunimoModder.Android/JunimoModder.Android.csproj
 
       - name: APK/AAB bauen
-        run: dotnet publish -f:net8.0-android -c Release -o output-android
+        run: dotnet publish JunimoModder.Android/JunimoModder.Android.csproj -c Release -o output-android
 
       - name: APK/AAB hochladen
         uses: actions/upload-artifact@v4
@@ -50,29 +47,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: .NET SDKs installieren
+      - name: .NET 9 installieren
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: |
-            8.x
-            9.x
-            10.x
+          dotnet-version: '9.x'
 
       - name: MAUI Workloads installieren
         run: dotnet workload install maui maui-windows wasm-tools --skip-sign-check --source https://api.nuget.org/v3/index.json
 
-      - name: NuGet Pakete wiederherstellen
-        run: dotnet restore
+      - name: NuGet wiederherstellen
+        run: dotnet restore JunimoModder.Windows/JunimoModder.Windows.csproj
 
       - name: EXE bauen
-        run: dotnet publish -f:net8.0-windows10.0.19041.0 -c Release -o output-win
+        run: dotnet publish JunimoModder.Windows/JunimoModder.Windows.csproj -c Release -o output-win
 
       - name: EXE hochladen
         uses: actions/upload-artifact@v4
         with:
           name: Windows-Bundle
-          path: |
-            output-win/*.exe
+          path: output-win/*.exe
 
   build-macos:
     name: macOS Bundle
@@ -80,22 +73,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: .NET SDKs installieren
+      - name: .NET 9 installieren
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: |
-            8.x
-            9.x
-            10.x
+          dotnet-version: '9.x'
 
       - name: MAUI Workloads installieren
         run: dotnet workload install maui maui-maccatalyst wasm-tools --skip-sign-check --source https://api.nuget.org/v3/index.json
 
-      - name: NuGet Pakete wiederherstellen
-        run: dotnet restore
+      - name: NuGet wiederherstellen
+        run: dotnet restore JunimoModder.MacOS/JunimoModder.MacOS.csproj
 
       - name: Mac Catalyst App bauen
-        run: dotnet publish -f:net8.0-maccatalyst -c Release -o output-mac
+        run: dotnet publish JunimoModder.MacOS/JunimoModder.MacOS.csproj -c Release -o output-mac
 
       - name: Mac Bundle komprimieren
         run: tar -czvf JunimoModder-mac.tar.gz -C output-mac .
@@ -104,5 +94,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: MacOS-Bundle
-          path: |
-            JunimoModder-mac.tar.gz
+          path: JunimoModder-mac.tar.gz
