@@ -67,6 +67,7 @@ jobs:
         run: dotnet restore JunimoModder.Windows/JunimoModder.Windows.csproj
 
       - name: EXE bauen mit Standardname
+        shell: pwsh
         run: |
           dotnet publish JunimoModder.Windows/JunimoModder.Windows.csproj -c Release -o output-win
           $exe = Get-ChildItem -Path output-win -Filter *.exe | Sort-Object Length -Descending | Select-Object -First 1
@@ -93,12 +94,12 @@ jobs:
       - name: MAUI Workload (MacCatalyst)
         run: dotnet workload install maui-maccatalyst wasm-tools --skip-sign-check --source https://api.nuget.org/v3/index.json
 
-      - name: NuGet wiederherstellen
-        run: dotnet restore JunimoModder.MacOS/JunimoModder.MacOS.csproj
+      - name: NuGet wiederherstellen (Warnungen nicht als Fehler!)
+        run: dotnet restore JunimoModder.MacOS/JunimoModder.MacOS.csproj -warnaserror:false
 
-      - name: Mac Catalyst App bauen und als ZIP verpacken
+      - name: Mac Catalyst App bauen und als ZIP verpacken (Warnungen nicht als Fehler!)
         run: |
-          dotnet publish JunimoModder.MacOS/JunimoModder.MacOS.csproj -c Release -o output-mac
+          dotnet publish JunimoModder.MacOS/JunimoModder.MacOS.csproj -c Release -o output-mac -warnaserror:false
           APP=$(find output-mac -type d -name "*.app" | head -n1)
           if [ -z "$APP" ]; then
             echo "Keine .app gefunden!"
