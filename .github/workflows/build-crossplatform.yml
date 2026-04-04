@@ -24,8 +24,9 @@ jobs:
       - name: Android SDK installieren
         uses: android-actions/setup-android@v3
 
-      - name: MAUI Workloads installieren
-        run: dotnet workload install maui maui-android wasm-tools --skip-sign-check --source https://api.nuget.org/v3/index.json
+      # Achtung: KEIN "maui"-Meta-Workload, nur maui-android und wasm-tools!
+      - name: MAUI Workloads installieren (nur für Android verfügbar)
+        run: dotnet workload install maui-android wasm-tools --skip-sign-check --source https://api.nuget.org/v3/index.json
 
       - name: NuGet wiederherstellen
         run: dotnet restore JunimoModder.Android/JunimoModder.Android.csproj
@@ -53,7 +54,7 @@ jobs:
           dotnet-version: '9.x'
 
       - name: MAUI Workloads installieren
-        run: dotnet workload install maui maui-windows wasm-tools --skip-sign-check --source https://api.nuget.org/v3/index.json
+        run: dotnet workload install maui-windows wasm-tools --skip-sign-check --source https://api.nuget.org/v3/index.json
 
       - name: NuGet wiederherstellen
         run: dotnet restore JunimoModder.Windows/JunimoModder.Windows.csproj
@@ -73,13 +74,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: .NET 9 installieren
+      - name: .NET 8 installieren  # MacCatalyst auf .NET 9 geht auf GitHub Actions NICHT!
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '9.x'
+          dotnet-version: '8.x'
 
-      - name: MAUI Workloads installieren
-        run: dotnet workload install maui maui-maccatalyst wasm-tools --skip-sign-check --source https://api.nuget.org/v3/index.json
+      - name: MAUI Workload für MacCatalyst installieren
+        run: dotnet workload install maui-maccatalyst wasm-tools --skip-sign-check --source https://api.nuget.org/v3/index.json
 
       - name: NuGet wiederherstellen
         run: dotnet restore JunimoModder.MacOS/JunimoModder.MacOS.csproj
