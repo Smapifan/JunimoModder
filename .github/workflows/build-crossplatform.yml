@@ -1,98 +1,70 @@
-name: Build MAUI App Cross-Platform
+name: Build MAUI app for all platforms (exe, apk, mac)
 
 on:
   workflow_dispatch:
 
 jobs:
-  build-android:
-    name: Android Bundle
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+  build-release:
+    name: Build EXE + APK + Mac Bundle
+    runs-on: macos-latest
 
-      - name: .NET 9 installieren
+    steps:
+      - name: Code auschecken
+        uses: actions/checkout@v4
+
+      # ----------------- WINDOWS (net9.0) -----------------
+      - name: .NET 9 SDK für Windows installieren
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.x'
+      - name: MAUI Workload für Windows installieren
+        run: dotnet workload install maui-windows wasm-tools --skip-sign-check --source https://api.nuget.org/v3/index.json
+      - name: Windows EXE bauen
+        run: |
+          dotnet restore JunimoModder.Windows/JunimoModder.Windows.csproj
+          dotnet publish JunimoModder.Windows/JunimoModder.Windows.csproj -c Release -o output-win
 
+      # ----------------- ANDROID (net9.0) -----------------
       - name: Java installieren
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
-
       - name: Android SDK installieren
         uses: android-actions/setup-android@v3
-
-      # Achtung: KEIN "maui"-Meta-Workload, nur maui-android und wasm-tools!
-      - name: MAUI Workloads installieren (nur für Android verfügbar)
+      - name: MAUI Workload für Android installieren
         run: dotnet workload install maui-android wasm-tools --skip-sign-check --source https://api.nuget.org/v3/index.json
+      - name: Android APK/AAB bauen
+        run: |
+          dotnet restore JunimoModder.Android/JunimoModder.Android.csproj
+          dotnet publish JunimoModder.Android/JunimoModder.Android.csproj -c Release -o output-android
 
-      - name: NuGet wiederherstellen
-        run: dotnet restore JunimoModder.Android/JunimoModder.Android.csproj
-
-      - name: APK/AAB bauen
-        run: dotnet publish JunimoModder.Android/JunimoModder.Android.csproj -c Release -o output-android
-
-      - name: APK/AAB hochladen
-        uses: actions/upload-artifact@v4
-        with:
-          name: Android-Bundle
-          path: |
-            output-android/*.apk
-            output-android/*.aab
-
-  build-windows:
-    name: Windows Bundle
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: .NET 9 installieren
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '9.x'
-
-      - name: MAUI Workloads installieren
-        run: dotnet workload install maui-windows wasm-tools --skip-sign-check --source https://api.nuget.org/v3/index.json
-
-      - name: NuGet wiederherstellen
-        run: dotnet restore JunimoModder.Windows/JunimoModder.Windows.csproj
-
-      - name: EXE bauen
-        run: dotnet publish JunimoModder.Windows/JunimoModder.Windows.csproj -c Release -o output-win
-
-      - name: EXE hochladen
-        uses: actions/upload-artifact@v4
-        with:
-          name: Windows-Bundle
-          path: output-win/*.exe
-
-  build-macos:
-    name: macOS Bundle
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: .NET 8 installieren  # MacCatalyst auf .NET 9 geht auf GitHub Actions NICHT!
+      # ----------------- MAC CATALYST (net8.0!) -----------------
+      - name: .NET 8 SDK für MacCatalyst installieren
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.x'
-
       - name: MAUI Workload für MacCatalyst installieren
         run: dotnet workload install maui-maccatalyst wasm-tools --skip-sign-check --source https://api.nuget.org/v3/index.json
+      - name: MacCatalyst App bauen
+        run: |
+          dotnet restore JunimoModder.MacOS/JunimoModder.MacOS.csproj
+          dotnet publish JunimoModder.MacOS/JunimoModder.MacOS.csproj -c Release -o output-mac
 
-      - name: NuGet wiederherstellen
-        run: dotnet restore JunimoModder.MacOS/JunimoModder.MacOS.csproj
+      # ----------------- Paket zusammenstellen (alle Plattformen) -----------------
+      - name: Alles in ein ZIP packen
+        run: |
+          mkdir all-platforms-bundle
+          cp output-win/*.exe all-platforms-bundle/ 2>/dev/null || true
+          cp output-android/*.apk all-platforms-bundle/ 2>/dev/null || true
+          cp output-android/*.aab all-platforms-bundle/ 2>/dev/null || true
+          cp -r output-mac/* all-platforms-bundle/ 2>/dev/null || true
+          cd all-platforms-bundle
+          zip -r ../JunimoModder_all_platforms.zip . || true
+          cd ..
 
-      - name: Mac Catalyst App bauen
-        run: dotnet publish JunimoModder.MacOS/JunimoModder.MacOS.csproj -c Release -o output-mac
-
-      - name: Mac Bundle komprimieren
-        run: tar -czvf JunimoModder-mac.tar.gz -C output-mac .
-
-      - name: Mac-Bundle hochladen
+      - name: Gesamtpaket hochladen
         uses: actions/upload-artifact@v4
         with:
-          name: MacOS-Bundle
-          path: JunimoModder-mac.tar.gz
+          name: JunimoModder_all_platforms
+          path: JunimoModder_all_platforms.zip
