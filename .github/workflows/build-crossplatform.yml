@@ -5,11 +5,12 @@ on:
 
 jobs:
   build-android:
+    name: Android Bundle
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Install .NET SDKs
+
+      - name: .NET SDKs installieren
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
@@ -17,35 +18,39 @@ jobs:
             9.x
             10.x
 
-      - name: Setup Java
+      - name: Java installieren
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
-      
-      - name: Setup Android SDK
+
+      - name: Android SDK installieren
         uses: android-actions/setup-android@v3
 
-      - name: Restore NuGet packages
+      - name: MAUI Workloads installieren
+        run: dotnet workload install maui maui-android wasm-tools --skip-sign-check --source https://api.nuget.org/v3/index.json
+
+      - name: NuGet Pakete wiederherstellen
         run: dotnet restore
 
-      - name: Build MAUI Android
+      - name: APK/AAB bauen
         run: dotnet publish -f:net8.0-android -c Release -o output-android
 
-      - name: Upload Android Artifact
+      - name: APK/AAB hochladen
         uses: actions/upload-artifact@v4
         with:
-          name: Android-APK
+          name: Android-Bundle
           path: |
             output-android/*.apk
             output-android/*.aab
 
   build-windows:
+    name: Windows Bundle
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install .NET SDKs
+      - name: .NET SDKs installieren
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
@@ -53,25 +58,29 @@ jobs:
             9.x
             10.x
 
-      - name: Restore NuGet packages
+      - name: MAUI Workloads installieren
+        run: dotnet workload install maui maui-windows wasm-tools --skip-sign-check --source https://api.nuget.org/v3/index.json
+
+      - name: NuGet Pakete wiederherstellen
         run: dotnet restore
 
-      - name: Build MAUI WinUI
+      - name: EXE bauen
         run: dotnet publish -f:net8.0-windows10.0.19041.0 -c Release -o output-win
 
-      - name: Upload Windows Artifact
+      - name: EXE hochladen
         uses: actions/upload-artifact@v4
         with:
-          name: Win-EXE
+          name: Windows-Bundle
           path: |
             output-win/*.exe
 
   build-macos:
+    name: macOS Bundle
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install .NET SDKs
+      - name: .NET SDKs installieren
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
@@ -79,18 +88,21 @@ jobs:
             9.x
             10.x
 
-      - name: Restore NuGet packages
+      - name: MAUI Workloads installieren
+        run: dotnet workload install maui maui-maccatalyst wasm-tools --skip-sign-check --source https://api.nuget.org/v3/index.json
+
+      - name: NuGet Pakete wiederherstellen
         run: dotnet restore
 
-      - name: Build MAUI MacCatalyst
+      - name: Mac Catalyst App bauen
         run: dotnet publish -f:net8.0-maccatalyst -c Release -o output-mac
 
-      - name: Compress Mac Bundle
+      - name: Mac Bundle komprimieren
         run: tar -czvf JunimoModder-mac.tar.gz -C output-mac .
 
-      - name: Upload MacOS Artifact
+      - name: Mac-Bundle hochladen
         uses: actions/upload-artifact@v4
         with:
-          name: MacOS-App
+          name: MacOS-Bundle
           path: |
             JunimoModder-mac.tar.gz
